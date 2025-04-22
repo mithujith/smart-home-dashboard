@@ -1,0 +1,124 @@
+body {
+    font-family: Arial, sans-serif;
+    background-image: url('images/background-2.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    position: relative;
+}
+
+.profile-container {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 0.5px solid #000;
+}
+
+.welcome-text {
+    font-size: 18px;
+    font-style: italic;
+    color: white;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.device-card, .weather-card, .rooms-card {
+    background-color: rgba(183, 183, 183, 0.404);
+    border-radius: 19px;
+    box-shadow: 0 6px 6px rgba(45, 45, 45, 0.564);
+    padding: 10px;
+    text-align: center;
+    transition: transform 0.6s, background-color 0.6s;
+}
+
+.device-card:hover, .weather-card:hover, .rooms-card:hover {
+    transform: translateY(-8px);
+}
+
+.device-icon, .weather-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    color: #4CAF50;
+    cursor: pointer;
+}
+
+.device-name, .time {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.device-status {
+    font-size: 16px;
+    color: white;
+}
+
+.device-card.on {
+    background-color: rgba(100, 255, 100, 0.7);
+}
+
+.weather-card {
+    grid-column: span 2;
+    padding: 20px;
+    border-radius: 12px;
+    background-image: url('images/weather-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+.rooms-card {
+    grid-column: span 2;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.room-button {
+    padding: 5px 10px;
+    font-size: 14px;
+    width: 120px;
+    background-color: #898989;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 5px;
+    text-align: center;
+}
+
+.room-button.active {
+    background-color: #4CAF50;
+}
+
+.room-button:hover {
+    background-color: #666;
+}

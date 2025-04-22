@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Smart Home Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="profile-container">
+        <img src="images/Profile-pic.jpg" alt="Profile Picture" class="profile-pic" />
+        <div class="welcome-text">Mithujith Rathnayake.</div>
+    </div>
+
+    <h1>Smart Home Dashboard</h1>
+
+    <div class="dashboard">
+        <div class="weather-card">
+            <div class="weather-icon" id="weather-icon">🌞</div>
+            <div class="time" id="time">Loading time...</div>
+            <div class="device-status" id="weather">Loading weather...</div>
+        </div>
+
+        <div class="rooms-card">
+            <button class="room-button" onclick="filterDevices('all')">All</button>
+            <button class="room-button" onclick="filterDevices('bedroom')">Bedroom</button>
+            <button class="room-button" onclick="filterDevices('table')">Table</button>
+            <button class="room-button" onclick="filterDevices('balcony')">Balcony</button>
+        </div>
+
+        <div class="device-card bedroom" onclick="toggleDevice(this)">
+            <div class="device-icon">💡</div>
+            <div class="device-name">Neon Lights</div>
+            <div class="device-status">Off</div>
+        </div>
+
+        <div class="device-card bedroom" onclick="toggleDevice(this)">
+            <div class="device-icon">💡</div>
+            <div class="device-name">Ceiling Lights</div>
+            <div class="device-status">Off</div>
+        </div>
+
+        <div class="device-card table" onclick="toggleDevice(this)">
+            <div class="device-icon">💻</div>
+            <div class="device-name">Laptop Charger</div>
+            <div class="device-status">Off</div>
+        </div>
+
+        <div class="device-card table" onclick="toggleDevice(this)">
+            <div class="device-icon">🖥️</div>
+            <div class="device-name">Monitor</div>
+            <div class="device-status">Off</div>
+        </div>
+
+        <div class="device-card table" onclick="toggleDevice(this)">
+            <div class="device-icon">🔊</div>
+            <div class="device-name">Speakers</div>
+            <div class="device-status">Off</div>
+        </div>
+
+        <div class="device-card table" onclick="toggleDevice(this)">
+            <div class="device-icon">💡</div>
+            <div class="device-name">Table Lights</div>
+            <div class="device-status">Off</div>
+        </div>
+
+        <div class="device-card bedroom" onclick="toggleDevice(this)">
+            <div class="device-icon">🔌</div>
+            <div class="device-name">Remove Mosquito</div>
+            <div class="device-status">Off</div>
+        </div>
+
+        <div class="device-card balcony" onclick="toggleDevice(this)">
+            <div class="device-icon">💡</div>
+            <div class="device-name">Balcony Lights</div>
+            <div class="device-status">Off</div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = '4248da84e1f29bc3b9f393dd2c6f24f7';
+        const city = 'Colombo';
+        const country = 'LK';
+        const blynkToken = 'Y5ifWnaGk9OKbsIqbE1sJDKs32CV8dBC';
+    
+        function fetchWeather() {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&units=metric&appid=${apiKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    const temp = data.main.temp;
+                    const weatherDescription = data.weather[0].description;
+                    const weatherIcon = data.weather[0].icon;
+    
+                    document.getElementById('weather').innerText = `${temp}°C, ${weatherDescription}`;
+                    document.getElementById('weather-icon').innerHTML = getWeatherIcon(weatherIcon);
+                })
+                .catch(error => console.error('Error fetching weather:', error));
+        }
+    
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('time').innerText = timeString;
+        }
+    
+        function toggleDevice(card) {
+            const statusElement = card.querySelector('.device-status');
+            const isOn = statusElement.textContent === 'On';
+    
+            statusElement.textContent = isOn ? 'Off' : 'On';
+            card.classList.toggle('on', !isOn);
+    
+            const deviceName = card.querySelector('.device-name').textContent;
+            let vpin = getVPinForDevice(deviceName);
+    
+            if (vpin) {
+                const value = isOn ? 0 : 1;
+                fetch(`https://blynk.cloud/external/api/update?token=${blynkToken}&${vpin}=${value}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('Failed to update Blynk');
+                    })
+                    .catch(err => console.error('Blynk error:', err));
+            }
+        }
+    
+        function filterDevices(room) {
+            const cards = document.querySelectorAll('.device-card');
+            cards.forEach(card => {
+                card.style.display = room === 'all' || card.classList.contains(room) ? 'block' : 'none';
+            });
+        }
+    
+        function getWeatherIcon(iconCode) {
+            const iconMap = {
+                '01d': '☀️', '01n': '🌑',
+                '02d': '⛅', '02n': '☁️',
+                '03d': '☁️', '03n': '☁️',
+                '04d': '☁️', '04n': '☁️',
+                '09d': '🌧️', '09n': '🌧️',
+                '10d': '🌦️', '10n': '🌧️',
+                '11d': '🌩️', '11n': '🌩️',
+                '13d': '❄️', '13n': '❄️',
+                '50d': '🌫️', '50n': '🌫️'
+            };
+            return iconMap[iconCode] || '🌡️';
+        }
+    
+        function getVPinForDevice(name) {
+            const map = {
+                'Neon Lights': 'v0',
+                'Ceiling Lights': 'v1',
+                'Laptop Charger': 'v2',
+                'Monitor': 'v3',
+                'Speakers': 'v4',
+                'Table Lights': 'v5',
+                'Remove Mosquito': 'v6',
+                'Balcony Lights': 'v7',
+            };
+            return map[name];
+        }
+    
+        function getVPinForDeviceMap() {
+            return {
+                'Neon Lights': 'v0',
+                'Ceiling Lights': 'v1',
+                'Laptop Charger': 'v2',
+                'Monitor': 'v3',
+                'Speakers': 'v4',
+                'Table Lights': 'v5',
+                'Remove Mosquito': 'v6',
+                'Balcony Lights': 'v7',
+            };
+        }
+    
+        function syncDevices() {
+            const map = getVPinForDeviceMap();
+            Object.entries(map).forEach(([name, vpin]) => {
+                fetch(`https://blynk.cloud/external/api/get?token=${blynkToken}&vpin=${vpin}`)
+                    .then(res => res.json())
+                    .then(value => {
+                        const isOn = parseInt(value[0]) === 1;
+                        const cards = document.querySelectorAll('.device-card');
+                        cards.forEach(card => {
+                            if (card.querySelector('.device-name').textContent === name) {
+                                const statusElement = card.querySelector('.device-status');
+                                statusElement.textContent = isOn ? 'On' : 'Off';
+                                card.classList.toggle('on', isOn);
+                            }
+                        });
+                    })
+                    .catch(err => console.error('Error syncing device', name, err));
+            });
+        }
+    
+        window.onload = () => {
+            updateTime();
+            fetchWeather();
+            syncDevices();
+            setInterval(updateTime, 1000);
+        };
+    </script>
+</body>
+</html>
